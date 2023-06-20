@@ -1448,6 +1448,7 @@ dependencies = [
  "actix-web",
  "chrono",
  "serde",
+ "serde_json",
  "sqlx",
 ]
 

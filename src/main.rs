@@ -1,9 +1,16 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+mod rooms;
+use rooms::NewRoom;
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use std::time::Duration;
 use sqlx::postgres::PgPoolOptions;
 
-#[get("/get/v1/rooms")]
+#[get("/v1/rooms")]
 async fn get_rooms() -> impl Responder{
+    HttpResponse::Ok()
+}
+
+#[post("/v1/rooms")]
+async fn make_room(_new_room: web::Json<NewRoom>) -> impl Responder{
     HttpResponse::Ok()
 }
 
