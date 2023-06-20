@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS messages(
     id SERIAL PRIMARY KEY,
     time_created TIMESTAMP NOT NULL,
     room INTEGER NOT NULL,
-    body VARCHAR(2000) NOT NULL
+    body VARCHAR(200) NOT NULL
     CONSTRAINT room
         FOREIGN KEY (room) REFERENCES rooms (id)
 )
