@@ -1,5 +1,7 @@
 mod rooms;
+mod persist_message;
 use message::client_server;
+use persist_message::save_message;
 use rooms::{NewRoom, make_new_room, get_all_rooms};
 use actix_web::{get, post, web::{self, Path}, App, HttpResponse, HttpRequest, HttpServer, Responder};
 use std::time::Duration;
@@ -31,12 +33,13 @@ async fn recieve_command_message(message: String) -> impl Responder{
 }
 
 #[post("/v1/message")]
-async fn recieve_message(message: String) -> impl Responder{
+async fn recieve_message(message: String, app_data: HttpRequest) -> impl Responder{
     let message: client_server::NormalMessage = match serde_json::from_str(&message){
         Ok(val) => val,
         Err(_) => return HttpResponse::BadRequest()
     };
-
+    let pool = app_data.app_data::<sqlx::Pool<sqlx::Postgres>>().unwrap();
+    save_message(message, pool).await;
     HttpResponse::Ok()
 }
 
