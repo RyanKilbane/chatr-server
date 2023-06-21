@@ -1,4 +1,4 @@
-use std::{error::Error, fmt};
+use std::{error::Error, fmt, default};
 use sqlx::{query_as, Pool, Postgres};
 use serde::{Deserialize, Serialize};
 
@@ -18,10 +18,16 @@ impl fmt::Display for RoomCreateError{
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct NewRoom{
-    room_name: String,
-    room_owner: String,
-    is_private: bool,
-    password: Option<String>
+    pub room_name: String,
+    pub room_owner: String,
+    pub is_private: bool,
+    pub password: Option<String>
+}
+
+impl Default for NewRoom{
+    fn default() -> Self {
+        NewRoom { room_name: "".to_string(), room_owner: "".to_string(), is_private: false, password: None }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -38,6 +44,7 @@ pub struct RoomModel{
 }
 
 pub async fn make_new_room(new_room: NewRoom, pool: &Pool<Postgres>) -> Result<(), RoomCreateError>{
+    println!("{:?}", new_room);
     sqlx::query(r#"INSERT INTO users VALUES $1, $2, $3, $4"#)
     .bind(new_room.room_name)
     .bind(new_room.room_owner)
