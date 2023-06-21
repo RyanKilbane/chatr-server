@@ -12,9 +12,9 @@ pub struct MessageModel{
 
 pub async fn save_message(new_message: NormalMessage, pool: &Pool<Postgres>) {
     let message = new_message.message;
-    sqlx::query(r#"INSERT INTO messages VALUES $1, $2, $3, $4"#)
-    .bind(new_message.time_sent.timestamp())
-    .bind(message.room)
-    .bind(message.message_body)
-    .bind(message.sender).execute(pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO messages(time_created, room, body, sent_by) VALUES ($1, $2, $3, $4)"#, 
+    new_message.time_sent.naive_utc(),
+    1,
+    message.message_body,
+    message.sender).execute(pool).await.unwrap();
 }
