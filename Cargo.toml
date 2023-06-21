@@ -13,3 +13,4 @@ dotenv = "0.15.0"
 serde = { version = "1.0.164", features = ["derive"] }
 serde_json = "1.0.97"
 sqlx = { version = "0.6.3", features = ["runtime-tokio-native-tls", "postgres"] }
+message = {version = "0.1.0", path = "/home/ryan/Documents/projects/chatr/message/"}

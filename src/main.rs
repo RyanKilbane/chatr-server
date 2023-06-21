@@ -1,9 +1,9 @@
 mod rooms;
+use message::client_server;
 use rooms::{NewRoom, make_new_room, get_all_rooms};
-use actix_web::{get, post, web, App, HttpResponse, HttpRequest, HttpServer, Responder};
+use actix_web::{get, post, web::{self, Path}, App, HttpResponse, HttpRequest, HttpServer, Responder};
 use std::time::Duration;
 use sqlx::postgres::PgPoolOptions;
-
 
 
 #[get("/v1/rooms")]
@@ -22,6 +22,13 @@ async fn make_room(new_room: web::Json<NewRoom>, app_data: HttpRequest) -> impl 
     }
 }
 
+#[post("/v1/message/command")]
+async fn recieve_message(message: web::Json<client_server::CommandMessage>) -> impl Responder{
+    let command = message.0.message.command.unwrap();
+    
+    HttpResponse::Ok()
+}
+
 #[actix::main]
 async fn main() -> std::io::Result<()>{
     dotenv::dotenv().expect("Unable to load environment variables from .env file");
@@ -34,7 +41,7 @@ async fn main() -> std::io::Result<()>{
         .await
         .unwrap();
     HttpServer::new(
-        move || App::new().app_data(pool.clone()).service(get_rooms))
+        move || App::new().app_data(pool.clone()).service(get_rooms).service(make_room))
         .bind(("127.0.0.1", 8081))?
         .workers(WORKERS)
         .run()
