@@ -45,11 +45,11 @@ pub struct RoomModel{
 
 pub async fn make_new_room(new_room: NewRoom, pool: &Pool<Postgres>) -> Result<(), RoomCreateError>{
     println!("{:?}", new_room);
-    sqlx::query(r#"INSERT INTO users VALUES $1, $2, $3, $4"#)
-    .bind(new_room.room_name)
-    .bind(new_room.room_owner)
-    .bind(new_room.is_private)
-    .bind(new_room.password).execute(pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO rooms(room_name, room_owner, is_private, password) VALUES ($1, $2, $3, $4)"#,
+    new_room.room_name,
+    new_room.room_owner,
+    new_room.is_private,
+    new_room.password).execute(pool).await.unwrap();
     Ok(())
 }
 
