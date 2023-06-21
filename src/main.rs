@@ -6,14 +6,12 @@ use std::time::Duration;
 use sqlx::postgres::PgPoolOptions;
 
 
-#[get("/v1/rooms")]
 async fn get_rooms(app_data: HttpRequest) -> impl Responder{
     let pool = app_data.app_data::<sqlx::Pool<sqlx::Postgres>>().unwrap();
     get_all_rooms(pool).await;
     HttpResponse::Ok()
 }
 
-#[post("/v1/rooms")]
 async fn make_room(new_room: web::Json<NewRoom>, app_data: HttpRequest) -> impl Responder{
     let con = app_data.app_data::<sqlx::Pool<sqlx::Postgres>>().unwrap();
     match make_new_room(new_room.0, con).await{
@@ -23,11 +21,31 @@ async fn make_room(new_room: web::Json<NewRoom>, app_data: HttpRequest) -> impl 
 }
 
 #[post("/v1/message/command")]
-async fn recieve_message(message: web::Json<client_server::CommandMessage>) -> impl Responder{
-    let command = message.0.message.command.unwrap();
+async fn recieve_command_message(message: String) -> impl Responder{
+    let command: client_server::CommandMessage = match serde_json::from_str(&message){
+        Ok(val) => val,
+        Err(_) => return HttpResponse::BadRequest()
+    };
     
     HttpResponse::Ok()
 }
+
+#[post("/v1/message")]
+async fn recieve_message(message: String) -> impl Responder{
+    let message: client_server::NormalMessage = match serde_json::from_str(&message){
+        Ok(val) => val,
+        Err(_) => return HttpResponse::BadRequest()
+    };
+
+    HttpResponse::Ok()
+}
+
+#[get("/")]
+async fn connected() ->impl Responder{
+    println!("Connected");
+    HttpResponse::Ok()
+}
+
 
 #[actix::main]
 async fn main() -> std::io::Result<()>{
@@ -41,7 +59,7 @@ async fn main() -> std::io::Result<()>{
         .await
         .unwrap();
     HttpServer::new(
-        move || App::new().app_data(pool.clone()).service(get_rooms).service(make_room))
+        move || App::new().app_data(pool.clone()).service(recieve_command_message).service(recieve_message).service(connected))
         .bind(("127.0.0.1", 8081))?
         .workers(WORKERS)
         .run()
