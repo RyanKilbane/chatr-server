@@ -3,7 +3,5 @@ CREATE TABLE IF NOT EXISTS rooms(
     room_name VARCHAR(50) UNIQUE NOT NULL,
     room_owner VARCHAR(150) NOT NULL,
     is_private BOOLEAN NOT NULL,
-    password VARCHAR(150),
-    CONSTRAINT room_owner
-        FOREIGN KEY (room_owner) REFERENCES users (nick)
+    password VARCHAR(150)
 )

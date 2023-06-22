@@ -28,7 +28,6 @@ async fn make_room<'a>(new_room: &Vec<Tokens<'a>>, app_data: HttpRequest) -> imp
     };
 
     let new_room = NewRoom{room_name: room_name, ..Default::default()};
-    println!("{:?}", new_room);
     match make_new_room(new_room, con).await{
         Ok(_) => HttpResponse::Created(),
         Err(_e) => HttpResponse::InternalServerError()
@@ -50,6 +49,10 @@ async fn recieve_command_message(message: String, app_data: HttpRequest) -> impl
             match token{
                 command_reader::lexer::Tokens::Create => {
                     make_room(&lexer.tokens, app_data).await;
+                }
+
+                command_reader::lexer::Tokens::List => {
+                    get_rooms(app_data).await; 
                 }
 
                 _ => {
