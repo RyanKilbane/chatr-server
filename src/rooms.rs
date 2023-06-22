@@ -1,4 +1,4 @@
-use std::{error::Error, fmt, default};
+use std::{error::Error, fmt};
 use sqlx::{query_as, Pool, Postgres};
 use serde::{Deserialize, Serialize};
 
